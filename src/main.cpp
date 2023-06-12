@@ -1,4 +1,4 @@
-#include <ESP8266WiFi.h>
+#include <ESP8266WiFi.h> // Neds to change to ESP 32 !!!!!!!!!!!!!!!!!!!!!!!!!
 #include <WebSocketsServer.h>
 
 const char* ssid = "VR-Gehirnwaescheeinheit24";
@@ -48,7 +48,7 @@ void setup() {
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname("ESP-F-Body"); //=====================================
+  WiFi.hostname("ESP-L-Arm"); // Neds to change to current body position: ESP-L-Arm / ESP-F-Body / ESP-R-Body / ESP-R-Arm / ESP-Head / ESP-L-Leg / ESP-R-Leg / ESP-Extra
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
