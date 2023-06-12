@@ -48,7 +48,7 @@ void setup() {
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname("ESP_L_Arm");
+  WiFi.hostname("ESP-F-Body"); //=====================================
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
