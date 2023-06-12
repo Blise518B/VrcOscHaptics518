@@ -48,7 +48,7 @@ void setup() {
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname("HapticESP_1");
+  WiFi.hostname("ESP_L_Arm");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
