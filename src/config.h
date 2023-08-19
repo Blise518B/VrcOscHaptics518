@@ -2,8 +2,8 @@
 #define CONFIG_H
 
 // Network Information
-const char* ssid = "VR-Gehirnwaescheeinheit24";
-const char* password = "LidBd21J";
+const char ssid[] = "VR-Gehirnwaescheeinheit24";
+const char password[] = "LidBd21J";
 const int webSocketPort = 8080;
 
 // Motor Configuration

@@ -57,7 +57,7 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
 
   // Initialize PWM pins
-  for (int i = 0; i < numPins; i++) {
+  for (size_t i = 0; i < numPins; i++) {
     pinMode(pwmPins[i], OUTPUT);
     WriteToMotor(i, 0);
   }
