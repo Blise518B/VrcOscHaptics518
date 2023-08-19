@@ -8,7 +8,7 @@ unsigned long prevPacketTime = 0;
 bool packetReceived = false;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
-  if (type == WStype_TEXT) {
+  if (type == WStype_BIN) {
     unsigned long currentPacketTime = millis();
     packetReceived = true;
 
