@@ -1,16 +1,21 @@
 #include <ESP8266WiFi.h> // Neds to change to ESP 32 !!!!!!!!!!!!!!!!!!!!!!!!!
 #include <WebSocketsServer.h>
-
-const char* ssid = "VR-Gehirnwaescheeinheit24";
-const char* password = "LidBd21J";
-const int webSocketPort = 8080;
+#include <config.h>
 
 WebSocketsServer webSocket = WebSocketsServer(webSocketPort);
 unsigned long prevPacketTime = 0;
 bool packetReceived = false;
 
-const int pwmPins[] = {D1, D2, D5, D6, D7, D8};
-const int numPins = sizeof(pwmPins) / sizeof(pwmPins[0]);
+static void WriteToMotor(int motorID, uint8_t Str) {
+  uint lastTimeUpdated[numPins];
+  uint8_t currentPinOutput[numPins];
+
+  if (currentPinOutput[motorID] != Str) {
+    analogWrite(pwmPins[motorID], Str);
+    currentPinOutput[motorID] = Str;
+    lastTimeUpdated[motorID] = millis();
+  }
+}
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   if (type == WStype_TEXT) {
@@ -28,14 +33,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
     Serial.print("Received data: ");
     for (size_t i = 0; i < length; i++) {
-      Serial.print((char)payload[i]);
+      Serial.print(payload[i]);
       Serial.print(" ");
 
-      // Enable or disable PWM pins based on received boolean values
-      if (payload[i] == '1' && i < numPins) {
-        analogWrite(pwmPins[i], 128);  // 50% duty cycle (128/255)
-      } else if (payload[i] == '0' && i < numPins) {
-        analogWrite(pwmPins[i], 0);  // 0% duty cycle
+      // Set PWM pins based of of recieved strength values
+      if (i < numPins) {
+        WriteToMotor(i, payload[i]);
       }
     }
     Serial.print(" | ");
@@ -66,7 +69,7 @@ void setup() {
   // Initialize PWM pins
   for (int i = 0; i < numPins; i++) {
     pinMode(pwmPins[i], OUTPUT);
-    analogWrite(pwmPins[i], 0);
+    WriteToMotor(i, 0);
   }
 }
 
