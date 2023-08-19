@@ -1,21 +1,11 @@
 #include <ESP8266WiFi.h> // Neds to change to ESP 32 !!!!!!!!!!!!!!!!!!!!!!!!!
 #include <WebSocketsServer.h>
 #include <config.h>
+#include <motor.h>
 
 WebSocketsServer webSocket = WebSocketsServer(webSocketPort);
 unsigned long prevPacketTime = 0;
 bool packetReceived = false;
-
-static void WriteToMotor(int motorID, uint8_t Str) {
-  uint lastTimeUpdated[numPins];
-  uint8_t currentPinOutput[numPins];
-
-  if (currentPinOutput[motorID] != Str) {
-    analogWrite(pwmPins[motorID], Str);
-    currentPinOutput[motorID] = Str;
-    lastTimeUpdated[motorID] = millis();
-  }
-}
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
   if (type == WStype_TEXT) {
@@ -85,5 +75,7 @@ void loop() {
     Serial.print("Total program loop time (ms): ");
     Serial.println(loopTime);
     packetReceived = false;
+  } else {
+    CheckStrAttenuation();
   }
 }
