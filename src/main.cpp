@@ -3,7 +3,7 @@
 #include <config.h>
 #include <motor.h>
 
-WebSocketsServer webSocket = WebSocketsServer(webSocketPort);
+WebSocketsServer webSocket = WebSocketsServer(WEB_SOCKET_PORT);
 unsigned long prevPacketTime = 0;
 bool packetReceived = false;
 
@@ -27,7 +27,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
       Serial.print(" ");
 
       // Set PWM pins based of of recieved strength values
-      if (i < numPins) {
+      if (i < NUM_PINS) {
         WriteToMotor(i, payload[i]);
       }
     }
@@ -42,7 +42,7 @@ void setup() {
   Serial.print("Connecting to WiFi");
 
   WiFi.hostname("ESP-L-Arm"); // Neds to change to current body position: ESP-L-Arm / ESP-F-Body / ESP-R-Body / ESP-R-Arm / ESP-Head / ESP-L-Leg / ESP-R-Leg / ESP-Extra
-  WiFi.begin(ssid, password);
+  WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
     Serial.print(".");
@@ -57,8 +57,8 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
 
   // Initialize PWM pins
-  for (size_t i = 0; i < numPins; i++) {
-    pinMode(pwmPins[i], OUTPUT);
+  for (size_t i = 0; i < NUM_PINS; i++) {
+    pinMode(PWM_PINS[i], OUTPUT);
     WriteToMotor(i, 0);
   }
 }
