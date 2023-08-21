@@ -4,6 +4,8 @@
 // Network Information
 const char SSID[] = "VR-Gehirnwaescheeinheit24";
 const char PASSWORD[] = "LidBd21J";
+// ESP-L-Arm / ESP-F-Body / ESP-R-Body / ESP-R-Arm / ESP-Head / ESP-L-Leg / ESP-R-Leg / ESP-Extra
+const char WIFI_HOSTNAME[] = "ESP-L-Arm";
 const int WEB_SOCKET_PORT = 8080;
 
 // Motor Configuration

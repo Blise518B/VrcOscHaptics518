@@ -41,7 +41,7 @@ void setup() {
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname("ESP-L-Arm"); // Neds to change to current body position: ESP-L-Arm / ESP-F-Body / ESP-R-Body / ESP-R-Arm / ESP-Head / ESP-L-Leg / ESP-R-Leg / ESP-Extra
+  WiFi.hostname(WIFI_HOSTNAME);
   WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
