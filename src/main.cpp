@@ -1,19 +1,14 @@
 #include <ESP8266WiFi.h> // Neds to change to ESP 32 !!!!!!!!!!!!!!!!!!!!!!!!!
 #include <WebSocketsServer.h>
+#include <config.h>
+#include <motor.h>
 
-const char* ssid = "VR-Gehirnwaescheeinheit24";
-const char* password = "LidBd21J";
-const int webSocketPort = 8080;
-
-WebSocketsServer webSocket = WebSocketsServer(webSocketPort);
+WebSocketsServer webSocket = WebSocketsServer(WEB_SOCKET_PORT);
 unsigned long prevPacketTime = 0;
 bool packetReceived = false;
 
-const int pwmPins[] = {D1, D2, D5, D6, D7, D8};
-const int numPins = sizeof(pwmPins) / sizeof(pwmPins[0]);
-
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
-  if (type == WStype_TEXT) {
+  if (type == WStype_BIN) {
     unsigned long currentPacketTime = millis();
     packetReceived = true;
 
@@ -28,14 +23,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
 
     Serial.print("Received data: ");
     for (size_t i = 0; i < length; i++) {
-      Serial.print((char)payload[i]);
+      Serial.print(payload[i]);
       Serial.print(" ");
 
-      // Enable or disable PWM pins based on received boolean values
-      if (payload[i] == '1' && i < numPins) {
-        analogWrite(pwmPins[i], 128);  // 50% duty cycle (128/255)
-      } else if (payload[i] == '0' && i < numPins) {
-        analogWrite(pwmPins[i], 0);  // 0% duty cycle
+      // Set PWM pins based of of recieved strength values
+      if (i < NUM_PINS) {
+        WriteToMotor(i, payload[i]);
       }
     }
     Serial.print(" | ");
@@ -48,8 +41,8 @@ void setup() {
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname("ESP-L-Arm"); // Neds to change to current body position: ESP-L-Arm / ESP-F-Body / ESP-R-Body / ESP-R-Arm / ESP-Head / ESP-L-Leg / ESP-R-Leg / ESP-Extra
-  WiFi.begin(ssid, password);
+  WiFi.hostname(WIFI_HOSTNAME);
+  WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(200);
     Serial.print(".");
@@ -64,9 +57,9 @@ void setup() {
   webSocket.onEvent(webSocketEvent);
 
   // Initialize PWM pins
-  for (int i = 0; i < numPins; i++) {
-    pinMode(pwmPins[i], OUTPUT);
-    analogWrite(pwmPins[i], 0);
+  for (size_t i = 0; i < NUM_PINS; i++) {
+    pinMode(PWM_PINS[i], OUTPUT);
+    WriteToMotor(i, 0);
   }
 }
 
@@ -82,5 +75,7 @@ void loop() {
     Serial.print("Total program loop time (ms): ");
     Serial.println(loopTime);
     packetReceived = false;
+  } else {
+    CheckStrAttenuation();
   }
 }
