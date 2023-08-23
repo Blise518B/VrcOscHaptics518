@@ -4,7 +4,8 @@
 #include <motor.h>
 #include <network.h>
 
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   delay(200);
   Serial.println(" ");
@@ -13,12 +14,14 @@ void setup() {
   InitNetwork(WIFI_HOSTNAME, SSID, PASSWORD);
 
   // Initialize PWM pins
-  for (size_t i = 0; i < NUM_PINS; i++) {
+  for (size_t i = 0; i < NUM_PINS; i++)
+  {
     pinMode(PWM_PINS[i], OUTPUT);
     WriteToMotor(i, 0);
   }
 }
 
-void loop() {
+void loop()
+{
   LoopSocket();
 }
