@@ -12,6 +12,13 @@ void webSocketEvent(uint8_t num, WStype_t type,
 {
   if (type == WStype_BIN)
   {
+    // split the packet's tag and it's data
+    payload_t packet;
+    packet.tag = *payload;
+    packet.data_len = length - 1;
+    packet.data = payload + 1;
+
+    // time the packet and print to serial
     unsigned long currentPacketTime = millis();
     packetReceived = true;
 
@@ -25,17 +32,22 @@ void webSocketEvent(uint8_t num, WStype_t type,
 
     prevPacketTime = currentPacketTime;
 
-    switch (*payload)
+    // handle different the different payload tags
+    switch (packet.tag)
     {
     case Motor_Strength:
-      UpdateMotorStrength(payload + 1, length - 1);
+      UpdateMotorStrength(packet.data, packet.data_len);
       break;
     case Attenuation_Control:
-      if (length - 1 < sizeof(struct Attenuation_Control))
+      // make sure we don't copy a control packet of insufficient length
+      if (packet.data_len < sizeof(struct Attenuation_Control))
+      {
+        Serial.print("Malformed control packet recieved");
         break;
+      }
 
-      struct Attenuation_Control control = *(struct Attenuation_Control *)(payload + 1);
-      UpdateAttenuationFunc(control);
+      struct Attenuation_Control *control = (struct Attenuation_Control *)(packet.data);
+      UpdateAttenuationFunc(*control);
       break;
     }
   }
@@ -63,7 +75,7 @@ void InitNetwork(const char *hostname, const char *SSID,
   webSocket.onEvent(webSocketEvent);
 }
 
-void LoopSocket()
+bool LoopSocket()
 {
   unsigned long loopStartTime = millis();
 
@@ -78,8 +90,6 @@ void LoopSocket()
     Serial.println(loopTime);
     packetReceived = false;
   }
-  else
-  {
-    CheckStrAttenuation();
-  }
+
+  return packetReceived;
 }

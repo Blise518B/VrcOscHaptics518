@@ -23,5 +23,12 @@ void setup()
 
 void loop()
 {
-  LoopSocket();
+  bool updated_packet = LoopSocket();
+
+  // if we didn't recieve a packet this loop,
+  // check if haptic strength needs to be lowered
+  if (!updated_packet)
+  {
+    CheckStrAttenuation();
+  }
 }
