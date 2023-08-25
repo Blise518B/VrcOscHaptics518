@@ -1,81 +1,34 @@
-#include <ESP8266WiFi.h> // Neds to change to ESP 32 !!!!!!!!!!!!!!!!!!!!!!!!!
+#include <ESP8266WiFi.h>
 #include <WebSocketsServer.h>
 #include <config.h>
 #include <motor.h>
+#include <network.h>
 
-WebSocketsServer webSocket = WebSocketsServer(WEB_SOCKET_PORT);
-unsigned long prevPacketTime = 0;
-bool packetReceived = false;
-
-void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length) {
-  if (type == WStype_BIN) {
-    unsigned long currentPacketTime = millis();
-    packetReceived = true;
-
-    if (prevPacketTime != 0) {
-      unsigned long timeDiff = currentPacketTime - prevPacketTime;
-      Serial.print("Time between packets (ms): ");
-      Serial.print(timeDiff);
-      Serial.print(" | ");
-    }
-
-    prevPacketTime = currentPacketTime;
-
-    Serial.print("Received data: ");
-    for (size_t i = 0; i < length; i++) {
-      Serial.print(payload[i]);
-      Serial.print(" ");
-
-      // Set PWM pins based of of recieved strength values
-      if (i < NUM_PINS) {
-        WriteToMotor(i, payload[i]);
-      }
-    }
-    Serial.print(" | ");
-  }
-}
-
-void setup() {
+void setup()
+{
   Serial.begin(115200);
   delay(200);
   Serial.println(" ");
   Serial.print("Connecting to WiFi");
 
-  WiFi.hostname(WIFI_HOSTNAME);
-  WiFi.begin(SSID, PASSWORD);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(200);
-    Serial.print(".");
-  }
-  Serial.println(" ");
-
-  // Print ESP8266 IP address
-  Serial.print("Connected to WiFi. IP address: ");
-  Serial.println(WiFi.localIP());
-
-  webSocket.begin();
-  webSocket.onEvent(webSocketEvent);
+  InitNetwork(WIFI_HOSTNAME, SSID, PASSWORD);
 
   // Initialize PWM pins
-  for (size_t i = 0; i < NUM_PINS; i++) {
+  for (size_t i = 0; i < NUM_PINS; i++)
+  {
     pinMode(PWM_PINS[i], OUTPUT);
     WriteToMotor(i, 0);
   }
 }
 
-void loop() {
-  unsigned long loopStartTime = millis();
+void loop()
+{
+  bool updated_packet = LoopSocket();
 
-  webSocket.loop();
-
-  unsigned long loopEndTime = millis();
-  unsigned long loopTime = loopEndTime - loopStartTime;
-
-  if (packetReceived) {
-    Serial.print("Total program loop time (ms): ");
-    Serial.println(loopTime);
-    packetReceived = false;
-  } else {
+  // if we didn't recieve a packet this loop,
+  // check if haptic strength needs to be lowered
+  if (!updated_packet)
+  {
     CheckStrAttenuation();
   }
 }
