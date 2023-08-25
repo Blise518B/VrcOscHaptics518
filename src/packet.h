@@ -16,11 +16,11 @@ struct Attenuation_Control
   uint8_t AttenuationStrength;
 } __attribute__((packed));
 
-typedef struct Payload
+struct Payload
 {
   uint8_t tag;
   size_t data_len;
   uint8_t *data;
-} payload_t;
+};
 
 #endif
