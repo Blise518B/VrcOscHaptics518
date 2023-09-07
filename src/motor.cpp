@@ -10,20 +10,28 @@ uint32_t attenuationDelay = 10000;
 uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
 {
   unsigned long sinceLastUpdate = millis() - lastUpdate;
-  uint8_t attenuationValue;
 
   if (sinceLastUpdate < attenuationDelay)
   {
+    Serial.print("Not reached attenuation delay yet \n");
     return currentStrength;
   }
 
-  attenuationValue = attenuationSpeed * floor((float)(sinceLastUpdate - attenuationDelay) * 0.001);
+  // Calculate how much to decrease the strength this loop
+  uint8_t attenuationValue = attenuationSpeed * floor((float)(sinceLastUpdate - attenuationDelay) * 0.001);
+  
+  Serial.print("Attenuation value: ");
+  Serial.println(attenuationValue);
 
+  // Integer overflow! Yay!
   if (attenuationValue > currentStrength)
   {
+    Serial.print("Reached negative strength \n");
     return 0;
   }
-
+ 
+  Serial.print("Ramping down to: ");
+  Serial.println(currentStrength - attenuationValue);
   return currentStrength - attenuationValue;
 }
 
