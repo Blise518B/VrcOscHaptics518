@@ -1,6 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <config.h>
 #include <motor.h>
+#include <main.cpp>
 
 uint8_t currentStrInput[NUM_PINS];
 
@@ -19,7 +20,7 @@ uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
 
   // Calculate how much to decrease the strength this loop
   uint8_t attenuationValue = attenuationSpeed * floor((float)(sinceLastUpdate - attenuationDelay) * 0.001);
-  
+
   Serial.print("Attenuation value: ");
   Serial.println(attenuationValue);
 
@@ -29,7 +30,7 @@ uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
     Serial.print("Reached negative strength \n");
     return 0;
   }
- 
+
   Serial.print("Ramping down to: ");
   Serial.println(currentStrength - attenuationValue);
   return currentStrength - attenuationValue;
@@ -43,7 +44,8 @@ void WriteToMotor(size_t motorID, uint8_t Str)
   if (currentStrInput[motorID] != Str)
   {
     // if the input we recieve is new, update
-    analogWrite(PWM_PINS[motorID], Str);
+    // analogWrite(PWM_PINS[motorID], Str);
+    pwm.setPWM(PWM_PIN_MAPPING[motorID], 0, (Str * 16));
     currentStrInput[motorID] = Str;
     lastTimeUpdated[motorID] = millis();
     currentMotorOutput[motorID] = Str;
@@ -54,7 +56,8 @@ void WriteToMotor(size_t motorID, uint8_t Str)
     currentMotorOutput[motorID] = CalculateAttenuation(currentMotorOutput[motorID],
                                                        lastTimeUpdated[motorID]);
 
-    analogWrite(PWM_PINS[motorID], currentMotorOutput[motorID]);
+    // analogWrite(PWM_PINS[motorID], currentMotorOutput[motorID]);
+    pwm.setPWM(PWM_PIN_MAPPING[motorID], 0, (currentMotorOutput[motorID] * 16));
   }
 }
 

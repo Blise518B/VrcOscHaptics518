@@ -3,6 +3,10 @@
 #include <config.h>
 #include <motor.h>
 #include <network.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 void setup()
 {
@@ -14,9 +18,13 @@ void setup()
   InitNetwork(WIFI_HOSTNAME, SSID, PASSWORD);
 
   // Initialize PWM pins
-  for (size_t i = 0; i < NUM_PINS; i++)
+  pwm.begin();
+  pwm.setOscillatorFrequency(27000000);
+  pwm.setPWMFreq(1600);
+  Wire.setClock(400000);
+  for (size_t i = 0; i < NUM_MOTORS; i++)
   {
-    pinMode(PWM_PINS[i], OUTPUT);
+    // pinMode(PWM_PINS[i], OUTPUT);
     WriteToMotor(i, 0);
   }
 }
@@ -31,4 +39,8 @@ void loop()
   {
     CheckStrAttenuation();
   }
+
+#ifdef ESP8266
+  yield(); // take a breather, required for ESP8266
+#endif
 }

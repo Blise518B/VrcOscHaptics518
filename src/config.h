@@ -13,4 +13,6 @@ const int PWM_PINS[] = {D1, D2, D5, D6, D7, D8};
 const size_t NUM_PINS = sizeof(PWM_PINS) / sizeof(PWM_PINS[0]);
 const unsigned long ATTENUATION_TIME = 10000;
 
+const int PWM_PIN_MAPPING[] = {0, 2, 4, 6, 8, 10}; // New way of assigning pins
+const size_t NUM_MOTORS = sizeof(PWM_PIN_MAPPING) / sizeof(PWM_PIN_MAPPING[0]);
 #endif
