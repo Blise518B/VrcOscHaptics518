@@ -1,7 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <config.h>
 #include <motor.h>
-#include <main.cpp>
 
 uint8_t currentStrInput[NUM_PINS];
 

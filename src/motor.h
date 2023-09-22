@@ -6,6 +6,9 @@
 #include <stddef.h>
 #include <packet.h>
 
+#include <Adafruit_PWMServoDriver.h>
+extern Adafruit_PWMServoDriver pwm;
+
 // Takes a motorID assigned in the PWM_PINS array in config.h.
 // Takes a Strength value from 0-255.
 // Updates PWM signals to motors and
