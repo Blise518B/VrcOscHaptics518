@@ -49,7 +49,7 @@ void WriteToMotor(size_t motorID, uint8_t Str)
     lastTimeUpdated[motorID] = millis();
     currentMotorOutput[motorID] = Str;
   }
-  else
+  else if (Str <= 0)
   {
     // if the input we recieve is still the same, apply attenuation
     currentMotorOutput[motorID] = CalculateAttenuation(currentMotorOutput[motorID],
