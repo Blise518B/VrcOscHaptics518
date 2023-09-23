@@ -18,11 +18,14 @@ uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
     return currentStrength;
   }
 
+  if (currentStrength == 0){return 0;}
+
   if (sinceLastUpdate < attenuationDelay)
   {
     Serial.print("Not reached attenuation delay yet \n");
     return currentStrength;
   }
+
 
   // Calculate how much to decrease the strength this loop
   // the amount of time that has elapsed since we last attenuated
@@ -61,7 +64,7 @@ void WriteToMotor(size_t motorID, uint8_t Str)
     lastTimeUpdated[motorID] = millis();
     currentMotorOutput[motorID] = Str;
   }
-  else if (Str <= 0)
+  else
   {
     // if the input we recieve is still the same, apply attenuation
     currentMotorOutput[motorID] = CalculateAttenuation(currentMotorOutput[motorID],

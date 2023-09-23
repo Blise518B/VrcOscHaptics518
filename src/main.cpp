@@ -41,6 +41,6 @@ void loop()
   }
 
 #ifdef ESP8266
-  yield(); // take a breather, required for ESP8266
+  //yield(); // take a breather, required for ESP8266
 #endif
 }
