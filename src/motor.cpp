@@ -9,7 +9,14 @@ uint32_t attenuationDelay = 10000;
 
 uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
 {
+  static unsigned long LastAttenuation = 0;
   unsigned long sinceLastUpdate = millis() - lastUpdate;
+  
+  // update according to the refresh rate.
+  if ((millis() - LastAttenuation) < (1000 / FALLOFF_REFRESH_RATE)) 
+  {
+    return currentStrength;
+  }
 
   if (sinceLastUpdate < attenuationDelay)
   {
@@ -18,8 +25,11 @@ uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
   }
 
   // Calculate how much to decrease the strength this loop
-  uint8_t attenuationValue = attenuationSpeed * floor((float)(sinceLastUpdate - attenuationDelay) * 0.001);
-
+  // the amount of time that has elapsed since we last attenuated
+  float timeElapsed = (float)(millis() - LastAttenuation) * 0.001;
+  // speed * delta_time
+  uint8_t attenuationValue = floor((float)attenuationSpeed * timeElapsed);
+  
   Serial.print("Attenuation value: ");
   Serial.println(attenuationValue);
 
@@ -27,11 +37,13 @@ uint8_t CalculateAttenuation(uint8_t currentStrength, uint lastUpdate)
   if (attenuationValue > currentStrength)
   {
     Serial.print("Reached negative strength \n");
+    LastAttenuation = millis();
     return 0;
   }
 
   Serial.print("Ramping down to: ");
   Serial.println(currentStrength - attenuationValue);
+  LastAttenuation = millis();
   return currentStrength - attenuationValue;
 }
 
